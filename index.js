@@ -2,8 +2,11 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-import cookieParser from "cookie-parser";
 dotenv.config();
+import cookieParser from "cookie-parser";
+import authRouter from "./router/auth-router.js";
+import reportRouter from "./router/report-router.js";
+import errorMiddleware from "./middleware/error-middleware.js";
 
 const PORT = process.env.PORT;
 const app = express();
@@ -16,10 +19,9 @@ app.use(
     methods: ["GET", "POST"],
   })
 );
-
-app.get("/", (req, res) => {
-  res.json("Hello world");
-});
+app.use("/api/auth", authRouter);
+app.use("/api/report", reportRouter);
+app.use(errorMiddleware);
 
 async function start() {
   try {
