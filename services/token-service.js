@@ -1,6 +1,6 @@
 import jsonwebtoken from "jsonwebtoken";
 import ResetPasswordTokenModel from "../models/reset-password-token-model.js";
-import TokenModel from "../models/token-model.js";
+import RefreshTokenModel from "../models/refresh-token-model.js";
 import UserModel from "../models/user-model.js";
 const { sign, verify } = jsonwebtoken;
 
@@ -16,13 +16,13 @@ class TokenService {
   }
 
   async saveToken(userId, refreshToken) {
-    const candidate = await TokenModel.findOne({ userId });
+    const candidate = await RefreshTokenModel.findOne({ userId });
     if (candidate) {
       candidate.refreshToken = refreshToken;
       return candidate.save();
     }
 
-    return await TokenModel.create({ userId, refreshToken });
+    return await RefreshTokenModel.create({ userId, refreshToken });
   }
 
   async generateTokenForResetPassword(payload) {
@@ -65,7 +65,7 @@ class TokenService {
   }
 
   async removeToken(refreshToken) {
-    return await TokenModel.findOneAndDelete({ refreshToken });
+    return await RefreshTokenModel.findOneAndDelete({ refreshToken });
   }
 
   async verifyRefreshToken(refreshToken) {

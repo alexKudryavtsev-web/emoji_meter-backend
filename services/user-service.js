@@ -5,7 +5,7 @@ import TokenService from "./token-service.js";
 import UserDto from "../dto/user-dto.js";
 import ApiError from "../errors/api-error.js";
 import EmailService from "./email-service.js";
-import TokenModel from "../models/token-model.js";
+import RefreshTokenModel from "../models/refresh-token-model.js";
 import ResetPasswordTokenModel from "../models/reset-password-token-model.js";
 
 class UserService {
@@ -74,7 +74,7 @@ class UserService {
 
   async refresh(refreshToken) {
     const userData = await TokenService.verifyRefreshToken(refreshToken);
-    const tokenFromDB = await TokenModel.findOne({ refreshToken });
+    const tokenFromDB = await RefreshTokenModel.findOne({ refreshToken });
 
     if (!userData || !tokenFromDB) {
       throw ApiError.BadRequest("invalid refresh token");
@@ -110,7 +110,7 @@ class UserService {
       `${process.env.CLIENT_URL}/activateNewPassword/${activationResetPasswordLink}`
     );
 
-    await TokenModel.findOneAndDelete({ userId: user._id });
+    await RefreshTokenModel.findOneAndDelete({ userId: user._id });
 
     return token;
   }

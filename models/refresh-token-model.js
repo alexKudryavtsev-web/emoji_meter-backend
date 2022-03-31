@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 const { Schema, model } = mongoose;
 
-const TokenSchema = new Schema({
+const RefreshTokenSchema = new Schema({
   userId: {
     type: Schema.Types.ObjectId,
     ref: "User",
@@ -12,4 +12,4 @@ const TokenSchema = new Schema({
   },
 });
 
-export default model("Token", TokenSchema);
+export default model("RefreshToken", RefreshTokenSchema);
