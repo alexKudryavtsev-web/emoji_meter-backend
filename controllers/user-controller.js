@@ -64,17 +64,29 @@ class UserController {
     }
   }
 
-  async getNewPassword(req, res, next) {
+  async resetPassword(req, res, next) {
     try {
-      const { email, newPassword } = req.body;
-      
+      const { email } = req.body;
+      const token = await UserService.resetPassword(email);
+
+      return res.json({ token });
     } catch (e) {
-      next(e)
+      next(e);
     }
   }
 
   async activateNewPassword(req, res, next) {
-    res.json("psw");
+    try {
+      const { activationResetPasswordLink, newPassword } = req.body;
+
+      const user = await UserService.activateNewPassword(
+        activationResetPasswordLink,
+        newPassword
+      );
+      return res.json(user);
+    } catch (e) {
+      next(e);
+    }
   }
 }
 

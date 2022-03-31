@@ -16,7 +16,7 @@ app.use(cookieParser());
 app.use(
   cors({
     origin: process.env.CLIENT_URL,
-    methods: ["GET", "POST"],
+    credentials: true,
   })
 );
 app.use("/api/auth", authRouter);
@@ -26,7 +26,7 @@ app.use(errorMiddleware);
 async function start() {
   try {
     await mongoose.connect(
-      `mongodb+srv://admin:${process.env.DB_PASSWORD}@cluster0.ak3l6.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
+      `mongodb+srv://user:${process.env.DB_PASSWORD}@cluster0.n8m1x.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`
     );
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);

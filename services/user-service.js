@@ -6,6 +6,7 @@ import UserDto from "../dto/user-dto.js";
 import ApiError from "../errors/api-error.js";
 import EmailService from "./email-service.js";
 import TokenModel from "../models/token-model.js";
+import ResetPasswordTokenModel from "../models/reset-password-token-model.js";
 
 class UserService {
   async registration(email, password) {
@@ -35,7 +36,10 @@ class UserService {
 
   async login(email, password) {
     const user = await UserModel.findOne({ email });
-    const comparedPassword = bcrypt.compare(password, user.password);
+    if (!user) {
+      throw ApiError.BadRequest("wrong email");
+    }
+    const comparedPassword = await bcrypt.compare(password, user.password);
 
     if (!comparedPassword) {
       throw ApiError.BadRequest("wrong password");
@@ -85,7 +89,54 @@ class UserService {
     return { user: userDto, ...tokens };
   }
 
-  async getNewPassword(email) {}
+  async resetPassword(email) {
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      throw ApiError.BadRequest(`no account with this email ${email}`);
+    }
+
+    const activationResetPasswordLink = v4();
+    const token = await TokenService.generateTokenForResetPassword({
+      email,
+      activationResetPasswordLink,
+    });
+    await TokenService.saveTokenForResetPassword(
+      email,
+      activationResetPasswordLink,
+      token
+    );
+    await EmailService.sendActivationNewPasswordEmail(
+      email,
+      `${process.env.CLIENT_URL}/activateNewPassword/${activationResetPasswordLink}`
+    );
+
+    await TokenModel.findOneAndDelete({ userId: user._id });
+
+    return token;
+  }
+
+  async activateNewPassword(activationResetPasswordLink, newPassword) {
+    const resetPasswordToken = await ResetPasswordTokenModel.findOneAndDelete({
+      activationResetPasswordLink,
+    });
+    if (!resetPasswordToken) {
+      throw ApiError.BadRequest("wrong activation reset password link");
+    }
+
+    const tokenData = await TokenService.verifyResetPasswordToken(
+      resetPasswordToken.resetPasswordToken
+    );
+    const user = await UserModel.findById(resetPasswordToken.userId);
+
+    if (!tokenData || !user) {
+      throw ApiError.BadRequest(
+        "letter expired or incorrect activation reset password link"
+      );
+    }
+
+    user.password = await bcrypt.hash(newPassword, 3);
+    return await user.save();
+  }
 }
 
 export default new UserService();

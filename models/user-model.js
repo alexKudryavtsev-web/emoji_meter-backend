@@ -16,6 +16,9 @@ const UserSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  activationUserLink: {
+    type: String,
+  },
 });
 
 export default model("User", UserSchema);
