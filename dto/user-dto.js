@@ -1,6 +1,6 @@
 class UserDto {
   email;
-  isActivate;
+  isActivated;
   id;
 
   constructor(model) {

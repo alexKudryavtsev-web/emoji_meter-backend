@@ -7,9 +7,12 @@ const ReportSchema = new Schema({
     ref: "User",
     required: true,
   },
-  report: {
-    type: Map,
-    of: String,
+  emojis: {
+    type: String,
+    required: true,
+  },
+  comment: {
+    type: String,
     required: true,
   },
   date: {
@@ -18,4 +21,4 @@ const ReportSchema = new Schema({
   },
 });
 
-export default model(ReportSchema);
+export default model("Report", ReportSchema);
