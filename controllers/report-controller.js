@@ -4,7 +4,8 @@ import ReportService from "../services/report-service.js";
 class ReportController {
   async createReport(req, res, next) {
     try {
-      const { emojis, comment } = req.body;
+      const { emojis } = req.body;
+      const comment = req.body?.comment;
       const userId = req.user.id;
       const report = await ReportService.createReport(userId, emojis, comment);
       const reportDto = new ReportDto(report);

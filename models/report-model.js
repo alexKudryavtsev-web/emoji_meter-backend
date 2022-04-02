@@ -13,7 +13,6 @@ const ReportSchema = new Schema({
   },
   comment: {
     type: String,
-    required: true,
   },
   date: {
     type: Number,
